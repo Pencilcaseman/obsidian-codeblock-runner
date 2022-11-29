@@ -147,20 +147,18 @@ function codeBlockProcessor(
 
 			// const outputText = processCompileOutput(result);
 
-			const lines: any = [].concat(result.buildResult.stdout, result.buildResult.stderr, result.stdout, result.stderr);
+			// const lines: any = [].concat(result.buildResult.stdout, result.buildResult.stderr, result.stdout, result.asm, result.stderr);
+			let lines: any[] = [];
+			if (result.buildResult.stdout) { lines = lines.concat(result.buildResult.stdout); }
+			if (result.buildResult.stderr) { lines = lines.concat(result.buildResult.stderr); }
+			if (result.stdout) { lines = lines.concat(result.stdout); }
+			if (result.asm) { lines = lines.concat(result.asm); }
+			if (result.stderr) { lines = lines.concat(result.stderr); }
 
 			console.log(lines);
 
 			// Ensure we don't duplicate the output. Just update the existing block
 			element.querySelector(".code-runner-output")?.remove();
-
-			// const pre = document.createElement("pre");
-			// const code = document.createElement("code");
-			// code.className = "code-runner-output";
-			// code.innerText = outputText;
-			// pre.appendChild(code);
-
-			// element.appendChild(pre);
 
 			const output = element.children[element.children.length - 1].createEl("div", {cls: "code-runner-output"});
 			let lineNumber = 0;
@@ -331,38 +329,6 @@ function generateProgramConfig(source: any, config: any) {
 	}
 }
 
-function processCompileOutput(output: {
-	buildResult: Array<{ stderr: Array<object>, stdout: Array<object> }>,
-	code: number,
-	didExecute: boolean,
-	execTime: string,
-	okToCache: boolean,
-	processExecutionResultTime: number,
-	stderr: Array<{ text: string }>,
-	stdout: Array<{ text: string }>,
-	timedOut: boolean
-}): string {
-	let result = "";
-
-	if (output.stdout) {
-		result += "===== Code Output =====\n\n"
-		for (const line of output.stdout) {
-			result += line.text + "\n";
-		}
-		result += "\n";
-	}
-
-	if (output.stderr) {
-		result += "===== Errors =====\n\n"
-		for (const line of output.stderr) {
-			result += line.text + "\n";
-		}
-		result += "\n";
-	}
-
-	return result;
-}
-
 function restfulApiRequest(method: string, url: string, data: object): Promise<any> {
 	let toSend = null;
 
@@ -431,6 +397,7 @@ async function compileProgramConfig(config: any): Promise<{
 	execTime: string,
 	okToCache: boolean,
 	processExecutionResultTime: number,
+	asm?: Array<{ text: string }>,
 	stderr: Array<{ text: string }>,
 	stdout: Array<{ text: string }>,
 	timedOut: boolean
