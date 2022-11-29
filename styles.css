@@ -1,28 +1,28 @@
-.run-code-button {
-	color: var(--background-primary);
-	background-color: var(--text-faint);
+.codeblock-runner-button {
+	font: 13px "Consolas", Consolas;
+
+	color: var(--text-normal);
+	background-color: #282c34 !important;
 	border-radius: 10px 10px 10px 10px;
 
-	/* right-align */
 	display: block;
-	margin-left: auto;
-	margin-right: 0;
 
-	margin-bottom: -2px;
+	margin: 5px;
 	padding: 3px 8px;
 	font-size: 0.8em;
 
-	position: absolute;
-	top: 0px;
-	right: 0px;
+	top: 25px;
+	left: 50px;
+
+	z-index: 2;
 }
 
-.run-code-button:hover {
+.codeblock-runner-button:hover {
 	cursor: pointer;
-	background-color: var(--text-normal);
+	background-color: #3e4450 !important;
 }
 
-.run-code-button:focus {
+.codeblock-runner-button:focus {
 	/* Avoid an ugly focus outline on click in Chrome,
 	   but darken the button for accessibility.
 	   See https://stackoverflow.com/a/25298082/1481479 */
@@ -30,11 +30,11 @@
 	outline: 0;
 }
 
-.run-code-button:active {
+.codeblock-runner-button:active {
 	background-color: var(--text-normal);
 }
 
-.code-runner-output {
+.codeblock-runner-output {
 	background: inherit;
 	font-size: inherit;
 	font-family: "consolas", sans-serif;
@@ -47,11 +47,11 @@
 	margin: 0;
 }
 
-.has-run-code-button {
+.has-codeblock-runner-button {
 	position: relative;
 }
 
-.code-runner-output {
+.codeblock-runner-output {
 	background: #2f3034;
 	border-color: #2f3034;
 	border-radius: 10px;
@@ -63,7 +63,7 @@
     align-items: flex-start;
 }
 
-.code-runner-output-line {
+.codeblock-runner-output-line {
 	display: flex;
 	flex-direction: row;
 	justify-content: flex-start;
@@ -71,15 +71,15 @@
 	gap: 8px;
 }
 
-.code-runner-output-line-number {
-	color: #09abab;
+.codeblock-runner-output-line-number {
+	color: #1c9494 !important;
 	-webkit-user-select: none;
 	-moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
-.code-runner-output-text {
+.codeblock-runner-output-text {
 	margin: 0px;
 	color: #bdbdbd;
 }

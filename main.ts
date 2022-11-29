@@ -1,5 +1,8 @@
 import {App, MarkdownPostProcessorContext, MarkdownView, Notice, Plugin, PluginManifest} from "obsidian";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const highlighter = new (require("ansi-to-html"));
+
 let languages: [{
 	extensions: Array<string>
 	id: string
@@ -28,6 +31,16 @@ const defaultCompilers = [
 	{language: "python", compiler: "python311"}
 ];
 
+const languageAliases = [
+	{language: "c++", aliases: ["cpp", "cplusplus", "cc"]},
+	{language: "c", aliases: ["c"]},
+	{language: "cuda", aliases: ["cuda", "cu"]},
+	{language: "csharp", aliases: ["csharp", "cs"]},
+	{language: "rust", aliases: ["rust", "rs"]},
+	{language: "assembly", aliases: ["assembly", "asm"]},
+	{language: "python", aliases: ["python", "py"]}
+];
+
 interface CodeRunnerSettings {
 	mySetting: string;
 }
@@ -50,9 +63,6 @@ export default class CodeRunnerPlugin extends Plugin {
 		languages = await getLanguages();
 		compilers = await getCompilers();
 
-		console.log(languages);
-		console.log(compilers);
-
 		// Register the CodeBlock formatter
 		this.registerMarkdownPostProcessor((element, context) => {
 			codeBlockProcessor(element, context, this.app, this);
@@ -72,110 +82,83 @@ export default class CodeRunnerPlugin extends Plugin {
 	}
 }
 
-function extractCodeData(element: HTMLElement, context: MarkdownPostProcessorContext, app: App) {
-	const codeBlock = context.getSectionInfo(element);
+function codeBlockProcessor(element: HTMLElement,
+							context: MarkdownPostProcessorContext,
+							app: App,
+							plugin: CodeRunnerPlugin) {
+	const codeBlocks = element.querySelectorAll("code");
 
-	if (!codeBlock) {
-		return {"valid": false, "reason": "Code block not found"};
-	}
-
-	let fullProgram = "";
-	for (let i: number = codeBlock.lineStart; i < codeBlock.lineEnd; ++i) {
-		fullProgram += app.workspace.getActiveViewOfType(MarkdownView)?.editor.getLine(i) + "\n";
-	}
-
-	// Locate the <compile> ... </compile> tags, including new lines
-	const compileTagMatch = fullProgram.match(/<compile>([\s\S]*?)<\/compile>/);
-
-	if (!compileTagMatch) {
-		return {"valid": false, "reason": "Compile tags not found"};
-	}
-
-	const compileTagString = compileTagMatch[0];
-	const code = fullProgram.substring(fullProgram.indexOf("</compile>") + 10);
-
-	let config: object;
-	try {
-		config = JSON.parse(compileTagString.substring(9, compileTagString.length - 10));
-	} catch {
-		return {"valid": false, "reason": "Compile tag is not valid JSON"};
-	}
-
-	return {"valid": true, "code": code, "config": config}
-}
-
-function codeBlockProcessor(
-	element: HTMLElement,
-	context: MarkdownPostProcessorContext,
-	app: App,
-	plugin: CodeRunnerPlugin
-) {
-	const codeData = extractCodeData(element, context, app);
-
-	if (!codeData.valid) {
-		console.log("Code block was not runnable");
-		console.log("Reason: ", codeData.reason)
-		return;
-	}
-
-	const programConfig = generateProgramConfig(codeData.code, codeData.config);
-
-	console.log("Extracted information:");
-	console.log(codeData);
-	console.log(codeData.code);
-
-	console.log("Generated program config:");
-	console.log();
-
-	// Don't add more than once
-	if (element.classList.contains("has-code-block-run-button")) {
-		return;
-	}
-
-	element.classList.add("has-copy-button");
-
-	const button = document.createElement("button");
-	button.className = "code-runner-button";
-	button.type = "button";
-	button.innerText = "Run Code Block";
-
-	button.addEventListener("click", () => {
-		const compileResult = compileProgramConfig(programConfig);
-
-		compileResult.then(result => {
-			console.log("Result: ", result);
-
-			// const outputText = processCompileOutput(result);
-
-			// const lines: any = [].concat(result.buildResult.stdout, result.buildResult.stderr, result.stdout, result.asm, result.stderr);
-			let lines: any[] = [];
-			if (result.buildResult.stdout) { lines = lines.concat(result.buildResult.stdout); }
-			if (result.buildResult.stderr) { lines = lines.concat(result.buildResult.stderr); }
-			if (result.stdout) { lines = lines.concat(result.stdout); }
-			if (result.asm) { lines = lines.concat(result.asm); }
-			if (result.stderr) { lines = lines.concat(result.stderr); }
-
-			console.log(lines);
-
-			// Ensure we don't duplicate the output. Just update the existing block
-			element.querySelector(".code-runner-output")?.remove();
-
-			const output = element.children[element.children.length - 1].createEl("div", {cls: "code-runner-output"});
-			let lineNumber = 0;
-			for (const line of lines) {
-				lineNumber++;
-				let lineText = lineNumber.toString();
-				lineText = lineText.padStart((lines.length - 1).toString().length, "0");
-
-				console.log("Line: ", line);
-				const div = output.createEl("div", {cls: "code-runner-output-line"});
-				div.createEl("p", {cls: "code-runner-output-text code-runner-output-line-number"}).setText(lineText);
-				div.createEl("p", {cls: "code-runner-output-text"}).setText(line.text);
+	for (let i = 0; i < codeBlocks.length; i++) {
+		// Try catch is not ideal, but it both reduces errors and simplifies the code
+		try {
+			const codeBlock = codeBlocks[i];
+			if (codeBlock.classList.contains("has-codeblock-runner-button")) {
+				return;
+			} else {
+				codeBlock.classList.add("has-codeblock-runner-button");
 			}
-		});
-	});
 
-	element.children[0].insertBefore(button, element.children[0].children[0]);
+			let language = "NONE";
+			codeBlock.classList.forEach(property => {
+				if (property.startsWith("language-")) {
+					language = property.substring("language-".length);
+				}
+			});
+
+			const configMatch = codeBlock.innerText.match(/<compile>([\s\S]*?)<\/compile>/);
+			let programSource = codeBlock.innerText;
+			if (configMatch) {
+				programSource = programSource.substring(programSource.indexOf("</compile>") + "</compile>".length);
+			}
+
+			const config = configMatch
+				? JSON.parse(configMatch[0].substring("<compile>".length, configMatch[0].length - "</compile>".length))
+				: {language: language};
+			const fullConfig = generateProgramConfig(programSource, config);
+
+			// Block is not a valid language
+			if (!fullConfig) {
+				continue;
+			}
+
+			const button = document.createElement("button");
+			button.className = "codeblock-runner-button";
+			button.type = "button";
+			button.innerText = "Run Code Block";
+			element.children[0].insertBefore(button, element.children[0].children[0]);
+
+			button.addEventListener("click", () => {
+				const compileResult = compileProgramConfig(fullConfig);
+				compileResult.then(result => {
+					button.innerText = "Running...";
+					let lines: Array<{ text: string }>;
+					if (result.asm) {
+						// @ts-ignore
+						lines = [].concat(result.stderr, result.stdout, result.asm);
+					} else {
+						// @ts-ignore
+						lines = [].concat(result.buildResult.stdout, result.buildResult.stderr, result.stdout, result.stderr);
+					}
+
+					element.querySelector(".codeblock-runner-output")?.remove();
+					const output = element.children[element.children.length - 1].createEl("div", {cls: "codeblock-runner-output"});
+					let lineNumber = 0;
+					for (const line of lines) {
+						lineNumber++;
+						let lineText = lineNumber.toString();
+						lineText = lineText.padStart((lines.length - 1).toString().length, "0");
+
+						const div = output.createEl("div", {cls: "codeblock-runner-output-line"});
+						div.createEl("p", {cls: "codeblock-runner-output-text codeblock-runner-output-line-number"}).setText(lineText);
+						div.createEl("p", {cls: "codeblock-runner-output-text"}).innerHTML = highlighter.toHtml(line.text);
+					}
+					button.innerText = "Run Code Block";
+				});
+			});
+		} catch {
+			new Notice("Invalid configuration JSON string", 0);
+		}
+	}
 }
 
 function generateProgramConfig(source: any, config: any) {
@@ -189,10 +172,24 @@ function generateProgramConfig(source: any, config: any) {
 		return null;
 	}
 
+	if (language === "NONE") {
+		return null;
+	}
+
 	// Ensure that $language exists
 	for (const validLanguage of languages) {
 		if (language == validLanguage.id) {
 			valid = true;
+		}
+	}
+
+	for (const validAlias of languageAliases) {
+		for (const alias of validAlias.aliases) {
+			if (language === alias) {
+				language = validAlias.language;
+				valid = true;
+				break;
+			}
 		}
 	}
 
@@ -235,7 +232,6 @@ function generateProgramConfig(source: any, config: any) {
 
 	let mode = "run";
 	if (config.mode) {
-		console.log("Debug Point");
 		if (["run", "runner", "execute", "r"].includes(config.mode)) {
 			mode = "run";
 		} else if (["asm", "assembly", "a"].includes(config.mode)) {
@@ -272,7 +268,6 @@ function generateProgramConfig(source: any, config: any) {
 	}
 
 	// If we're just running the code (the default), use a simpler configuration
-	console.log("Mode: " + mode);
 	if (mode === "asm") {
 		return {
 			"source": source,
