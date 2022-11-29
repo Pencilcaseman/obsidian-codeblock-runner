@@ -145,20 +145,34 @@ function codeBlockProcessor(
 		compileResult.then(result => {
 			console.log("Result: ", result);
 
-			const outputText = processCompileOutput(result);
-			console.log(outputText);
+			// const outputText = processCompileOutput(result);
+
+			const lines: any = [].concat(result.buildResult.stdout, result.buildResult.stderr, result.stdout, result.stderr);
+
+			console.log(lines);
 
 			// Ensure we don't duplicate the output. Just update the existing block
-			if (element.classList.contains("code-runner-output)")) {
-				element.childNodes[element.children.length - 1].innerText = outputText;
-			} else {
-				const pre = document.createElement("pre");
-				const code = document.createElement("code");
-				code.className = "code-runner-output";
-				code.innerText = outputText;
-				pre.appendChild(code);
+			element.querySelector(".code-runner-output")?.remove();
 
-				element.appendChild(pre);
+			// const pre = document.createElement("pre");
+			// const code = document.createElement("code");
+			// code.className = "code-runner-output";
+			// code.innerText = outputText;
+			// pre.appendChild(code);
+
+			// element.appendChild(pre);
+
+			const output = element.children[element.children.length - 1].createEl("div", {cls: "code-runner-output"});
+			let lineNumber = 0;
+			for (const line of lines) {
+				lineNumber++;
+				let lineText = lineNumber.toString();
+				lineText = lineText.padStart((lines.length - 1).toString().length, "0");
+
+				console.log("Line: ", line);
+				const div = output.createEl("div", {cls: "code-runner-output-line"});
+				div.createEl("p", {cls: "code-runner-output-text code-runner-output-line-number"}).setText(lineText);
+				div.createEl("p", {cls: "code-runner-output-text"}).setText(line.text);
 			}
 		});
 	});
@@ -318,7 +332,7 @@ function generateProgramConfig(source: any, config: any) {
 }
 
 function processCompileOutput(output: {
-	buildResult: Array<object>,
+	buildResult: Array<{ stderr: Array<object>, stdout: Array<object> }>,
 	code: number,
 	didExecute: boolean,
 	execTime: string,
@@ -376,11 +390,25 @@ function restfulApiRequest(method: string, url: string, data: object): Promise<a
 	});
 }
 
-async function getLanguages(): Promise<object> {
+async function getLanguages(): Promise<[{
+	extensions: Array<string>
+	id: string
+	monaco: string
+	name: string
+}]> {
 	return restfulApiRequest("GET", "/api/languages", {});
 }
 
-async function getCompilers(languageID?: string): Promise<object> {
+async function getCompilers(languageID?: string): Promise<[
+	{
+		compilerType: string
+		id: string
+		instructionSet: string
+		lang: string
+		name: string
+		semver: string
+	}
+]> {
 	if (languageID) {
 		return restfulApiRequest("GET", "/api/compilers/" + languageID, {});
 	} else {
@@ -389,14 +417,22 @@ async function getCompilers(languageID?: string): Promise<object> {
 }
 
 async function compileProgramConfig(config: any): Promise<{
-	buildResult: Array<object>,
+	buildResult: {
+		code: number
+		compilationOptions: Array<string>
+		downloads: Array<string>
+		executableFilename: string
+		stderr: Array<string>
+		stdout: Array<string>
+		timedOut: boolean
+	},
 	code: number,
 	didExecute: boolean,
 	execTime: string,
 	okToCache: boolean,
 	processExecutionResultTime: number,
-	stderr: Array<object>,
-	stdout: Array<object>,
+	stderr: Array<{ text: string }>,
+	stdout: Array<{ text: string }>,
 	timedOut: boolean
 }> {
 	return restfulApiRequest("POST", "/api/compiler/" + config.compiler + "/compile", config);

@@ -50,3 +50,36 @@
 .has-run-code-button {
 	position: relative;
 }
+
+.code-runner-output {
+	background: #2f3034;
+	border-color: #2f3034;
+	border-radius: 10px;
+	padding: 10px 15px;
+	margin-top: 10px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.code-runner-output-line {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+    align-items: flex-start;
+	gap: 8px;
+}
+
+.code-runner-output-line-number {
+	color: #09abab;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.code-runner-output-text {
+	margin: 0px;
+	color: #bdbdbd;
+}

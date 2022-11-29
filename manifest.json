@@ -1,10 +1,10 @@
 {
-	"id": "codeblock-runner",
-	"name": "CodeBlock Runner",
-	"version": "0.0.1",
-	"minAppVersion": "0.15.0",
-	"description": "Compile and run code in almost any language, directly from Obsidian",
-	"author": "Toby Davis",
-	"authorUrl": "https://tobydavis.dev",
-	"isDesktopOnly": false
+  "id": "codeblock-runner",
+  "name": "CodeBlock Runner",
+  "version": "0.0.1",
+  "minAppVersion": "0.15.0",
+  "description": "Compile and run code in almost any language, directly from Obsidian",
+  "author": "Toby Davis",
+  "authorUrl": "https://tobydavis.dev",
+  "isDesktopOnly": false
 }
