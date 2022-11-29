@@ -1,73 +1,77 @@
-# Obsidian Sample Plugin
+# CodeBlock Runner
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+The CodeBlock Runner project for [Obsidian.md](https://obsidian.md) provides a simple and intuitive way to compile and run code from directly within Obsidian.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+Making use of the [GodBolt Compiler Explorer API](https://godbolt.org/) and Obsidian's Markdown features, it's possible to extract code blocks, identify the langauge they're written in and run the code remotely, sending the output back to your device.
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+---
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Changes the default font color to red using `styles.css`.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+## Basic Usage
 
-## First time developing plugins?
+The most basic usage of this Obsidian plugin is to simply create a code block and hit run!
 
-Quick starting guide for new plugin devs:
+For example, when provided with the following code block inside Obsidian:
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+````markdown
+```python
+print("Hello, World!")
+```
+````
 
-## Releasing new releases
+the plugin create a button which runs the code!
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+<p align="center">
+<img src="https://github.com/pencilcaseman/codeblock-runner/blob/master/img/hello_world_simple.png" width="800">
+</p>
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+This will also work for a huge number of other languages, such as C++. Simply change the language used in the code block:
 
-## Adding your plugin to the community plugin list
+<p align="center">
+<img src="https://github.com/pencilcaseman/codeblock-runner/blob/master/img/hello_world_simple_cpp.png" width="800">
+</p>
 
-- Check https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+---
 
-## How to use
+## More Advanced Usage
 
-- Clone this repo.
-- `npm i` or `yarn` to install dependencies
-- `npm run dev` to start compilation in watch mode.
+In addition to providing the simple interface shown above, this plugin also allows you to specify more advanced arguments at the top of your program using a JSON string.
 
-## Manually installing the plugin
+To specify these arguments, place the JSON object inside some `<compile> ... </compile>` tags at the top of your program.
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+For example:
 
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
+```cpp
+<compile>
+{
+    "mode": "run",
+    "language": "c++",
+    "libraries": [
+        {"id": "fmt", "version": "trunk"}
+    ]
+}
+</compile>
 
+// The rest of your program
+```
 
-## API Documentation
+### Specifying the Compiler
 
-See https://github.com/obsidianmd/obsidian-api
+The compiler (or interpreter/bytecode-generator) can be specified with the `"compiler"` field inside the JSON object. This must be a valid identifier for a Godbolt compiler. For example, `"python311"` (Python 3.11) or `"g95"` (g++ 9.5)
+
+### Specifying the Language
+
+Exactly like specifying the compiler, the language can be specified with the `"language"` element of the JSON object.
+
+### Specifying Libraries and Tools
+
+Libraries and tools can be specified with the `"libraries"` and `"tools"` options. The request libraries and tools must be supported by the Godbolt Compiler Explorer.
+
+**More work is required on documenting valid values for these optoins. If anyone would like to help with this, it would be greatly appreciated!**
+
+### Viewing Disassembly
+
+The plugin also supports the generation of compiled/intermediate results, such as assembly language or bytecode. This can be controlled by setting the `"mode"` option to either `"run"` or `"asm"`, for running the code or generating assembly respectively.
+
+<p align="center">
+<img src="https://github.com/pencilcaseman/codeblock-runner/blob/master/img/python_disassembly.png" width="800">
+</p>
