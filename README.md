@@ -6,6 +6,24 @@ Making use of the [GodBolt Compiler Explorer API](https://godbolt.org/) and Obsi
 
 ---
 
+## Installation
+
+Currently, as the package is not available on the Obsidian store (I want to get this sorted out quickly!), you will need to clone the repository and build it yourself. Luckily, this is very easy if you have [npm](https://www.npmjs.com/) and [git](https://git-scm.com/) installed.
+
+1. Open the `plugins` folder of Obsidian
+    - You will need to enable "Community Plugins" for this to work.
+    - Open the settings panel in Obsidian, and navigate to the Plugins section
+    - Enable community plugins and then click "open plugins folder"
+2. Open a terminal window in this folder
+3. Run: `git clone https://github.com/Pencilcaseman/codeblock-runner.git`
+4. Run: `npm i`
+5. Run: `npm run build`
+6. Enjoy!
+
+This will produce a `main.js` file inside the repository folder, which Obsidian can open and make use of directly. There's nothing else you need to do.
+
+---
+
 ## Basic Usage
 
 The most basic usage of this Obsidian plugin is to simply create a code block and hit run!
@@ -75,3 +93,9 @@ The plugin also supports the generation of compiled/intermediate results, such a
 <p align="center">
 <img src="https://github.com/pencilcaseman/codeblock-runner/blob/master/img/python_disassembly.png" width="800">
 </p>
+
+---
+
+## Credits
+
+Thank you to [Cy4Shot](https://github.com/Cy4Shot) for helping me develop this plugin.
