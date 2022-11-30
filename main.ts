@@ -128,6 +128,7 @@ function codeBlockProcessor(element: HTMLElement,
 			element.children[0].insertBefore(button, element.children[0].children[0]);
 
 			button.addEventListener("click", () => {
+				button.innerText = "Running...";
 				const compileResult = compileProgramConfig(fullConfig);
 				compileResult.then(result => {
 					button.innerText = "Running...";
@@ -154,6 +155,7 @@ function codeBlockProcessor(element: HTMLElement,
 					}
 					button.innerText = "Run Code Block";
 				});
+				button.innerText = "Run Code Block";
 			});
 		} catch {
 			new Notice("Invalid configuration JSON string", 0);
