@@ -147,7 +147,7 @@ function codeBlockProcessor(element: HTMLElement,
 					for (const line of lines) {
 						lineNumber++;
 						let lineText = lineNumber.toString();
-						lineText = lineText.padStart((lines.length - 1).toString().length, "0");
+						lineText = lineText.padStart(lines.length.toString().length, "0");
 
 						const div = output.createEl("div", {cls: "codeblock-runner-output-line"});
 						div.createEl("p", {cls: "codeblock-runner-output-text codeblock-runner-output-line-number"}).setText(lineText);
