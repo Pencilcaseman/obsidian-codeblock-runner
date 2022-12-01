@@ -72,7 +72,8 @@ const defaultCompilers = [
 	{language: "csharp", compiler: "dotnet700csharp"},
 	{language: "rust", compiler: "r1650"},
 	{language: "assembly", compiler: "llvmas700"},
-	{language: "python", compiler: "python311"}
+	{language: "python", compiler: "python311"},
+	{language: "haskell", compiler: "ghc922"},
 ];
 
 const languageAliases = [
@@ -82,7 +83,8 @@ const languageAliases = [
 	{language: "csharp", aliases: ["csharp", "cs"]},
 	{language: "rust", aliases: ["rust", "rs"]},
 	{language: "assembly", aliases: ["assembly", "asm"]},
-	{language: "python", aliases: ["python", "py"]}
+	{language: "python", aliases: ["python", "py"]},
+	{language: "haskell", aliases: ["hs"]}
 ];
 
 interface CodeRunnerSettings {
@@ -106,6 +108,9 @@ export default class CodeRunnerPlugin extends Plugin {
 		// Load the available languages and compilers
 		languages = await getLanguages();
 		compilers = await getCompilers();
+
+		console.log("Languages:", languages);
+		console.log("Compilers:", compilers);
 
 		// Register the CodeBlock formatter
 		this.registerMarkdownPostProcessor((element, context) => {
@@ -176,7 +181,6 @@ function codeBlockProcessor(element: HTMLElement,
 				button.innerText = "Running...";
 				const compileResult = compileProgramConfig(fullConfig);
 				compileResult.then(result => {
-					button.innerText = "Running...";
 					let lines: Array<{ text: string }>;
 					if (result.asm) {
 						// @ts-ignore
