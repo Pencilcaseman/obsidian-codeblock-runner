@@ -1,5 +1,18 @@
+/* Allows images to be centred*/
+img {
+	display: block !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+}
+
+.markdown-source-view.mod-cm6 .cm-content > * {
+	margin: auto auto !important;
+}
+
+/* The formatting for the codeblock runner button */
 .codeblock-runner-button {
 	font: 13px "Consolas", Consolas;
+	font-family: Consolas, sans-serif, monospace;
 
 	color: var(--text-normal);
 	background-color: #282c34 !important;
@@ -34,52 +47,77 @@
 	background-color: var(--text-normal);
 }
 
-.codeblock-runner-output {
-	background: inherit;
-	font-size: inherit;
-	font-family: "consolas", sans-serif;
-	padding: 10px;
-	border: 1px solid lightgray;
-	margin: 10px;
+/* Used to avoid adding a button more than once */
+.has-codeblock-runner-button {
+	position: relative;
+}
+
+/* The formatting for the codeblock runner close button */
+.codeblock-runner-close-button {
+	color: var(--text-normal);
+	background-color: #2f3034;
+	border-radius: 10px;
+	display: block;
+	font-size: 0.8em;
+	position: absolute;
+	margin: -3px;
+	right: 35px;
+}
+
+.codeblock-runner-close-button:hover {
+	background-color: #3e4450;
 }
 
 .highlight pre {
 	margin: 0;
 }
 
-.has-codeblock-runner-button {
-	position: relative;
-}
-
+/* The main output div */
 .codeblock-runner-output {
 	background: #2f3034;
 	border-color: #2f3034;
 	border-radius: 10px;
 	padding: 10px 15px;
-	margin-top: 10px;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
-    align-items: flex-start;
+	align-items: flex-start;
+	font-size: inherit;
+	font-family: "consolas", sans-serif;
+	margin: 10px;
 }
 
+/* A single line in the output */
 .codeblock-runner-output-line {
 	display: flex;
 	flex-direction: row;
 	justify-content: flex-start;
-    align-items: flex-start;
+	align-items: flex-start;
 	gap: 8px;
 }
 
+/* A line number in the output */
 .codeblock-runner-output-line-number {
 	color: #1c9494 !important;
 	-webkit-user-select: none;
 	-moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
+/* Text in the output line */
 .codeblock-runner-output-text {
 	margin: 0px;
 	color: #bdbdbd;
+}
+
+/* Runtime tag */
+.codeblock-runner-output-runtime-tag {
+	margin: 0px;
+	color: #a943e1;
+}
+
+.codeblock-runner-output-runtime-value {
+	margin: 0px;
+	color: #4ba1e7;
 }
