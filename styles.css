@@ -62,6 +62,7 @@ img {
 	position: absolute;
 	margin: -3px;
 	right: 35px;
+	padding: 8px;
 }
 
 .codeblock-runner-close-button:hover {
