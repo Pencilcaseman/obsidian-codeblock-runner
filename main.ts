@@ -87,6 +87,11 @@ const languageAliases = [
 	{language: "haskell", aliases: ["hs"]}
 ];
 
+const skipLanguages = [
+	"none",
+	"desmos-graph"
+];
+
 interface CodeRunnerSettings {
 	mySetting: string;
 }
@@ -259,6 +264,12 @@ function generateProgramConfig(source: any, config: any) {
 				break;
 			}
 		}
+	}
+
+	for (const skipLanguage of skipLanguages) {
+		if (language === skipLanguage) {
+            return null;
+        }
 	}
 
 	if (!valid) {
