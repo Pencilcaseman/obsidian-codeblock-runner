@@ -89,7 +89,10 @@ const languageAliases = [
 
 const skipLanguages = [
 	"none",
-	"desmos-graph"
+	"desmos-graph",
+	"json",
+	"yaml",
+	"yml"
 ];
 
 interface CodeRunnerSettings {
