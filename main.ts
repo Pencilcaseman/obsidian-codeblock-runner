@@ -1,7 +1,6 @@
 import {
 	App,
 	MarkdownPostProcessorContext,
-	MarkdownView,
 	Notice,
 	Plugin,
 	PluginManifest
@@ -244,7 +243,7 @@ function generateProgramConfig(source: any, config: any) {
 	if (config.language) {
 		language = config.language;
 	} else {
-		new Notice("A language must be specified for a code block to be runnable", 0);
+		new Notice("A language must be specified for a code block to be runnable", 3);
 		return null;
 	}
 
@@ -271,12 +270,12 @@ function generateProgramConfig(source: any, config: any) {
 
 	for (const skipLanguage of skipLanguages) {
 		if (language === skipLanguage) {
-            return null;
-        }
+			return null;
+		}
 	}
 
 	if (!valid) {
-		new Notice("Language '" + language + "' is not valid. For a list of valid languages, please see the settings page", 0);
+		new Notice("Language '" + language + "' is not valid. For a list of valid languages, please see the settings page", 3);
 		return null;
 	}
 
@@ -295,7 +294,7 @@ function generateProgramConfig(source: any, config: any) {
 	}
 
 	if (compiler == "NONE") {
-		new Notice("Compiler '" + compiler + "' is not valid. For a list of valid compilers, please see the settings page", 0);
+		new Notice("Compiler '" + compiler + "' is not valid. For a list of valid compilers, please see the settings page", 5);
 		return null;
 	} else {
 		valid = false;
@@ -307,7 +306,7 @@ function generateProgramConfig(source: any, config: any) {
 		}
 
 		if (!valid) {
-			new Notice("Compiler '" + compiler + "' is not valid. For a list of valid compilers, please see the settings page", 0);
+			new Notice("Compiler '" + compiler + "' is not valid. For a list of valid compilers, please see the settings page", 5);
 			return null;
 		}
 	}
@@ -319,7 +318,7 @@ function generateProgramConfig(source: any, config: any) {
 		} else if (["asm", "assembly", "a"].includes(config.mode)) {
 			mode = "asm";
 		} else {
-			new Notice("Mode '" + config.mode + "' is not valid. For a list of valid modes, please see the settings page", 0);
+			new Notice("Mode '" + config.mode + "' is not valid. For a list of valid modes, please see the settings page", 5);
 			return null;
 		}
 	}
