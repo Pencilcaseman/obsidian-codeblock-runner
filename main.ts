@@ -164,6 +164,13 @@ function codeBlockProcessor(element: HTMLElement,
 			const configMatch = codeBlock.innerText
 				.match(/<compile>([\s\S]*?)<\/compile>/);
 			let programSource = codeBlock.innerText;
+
+			// Don't add a run button if the block starts with "<!-- norun -->"
+			const skipButton = "<!-- norun -->";
+			if (programSource.substring(skipButton.length) === skipButton) {
+				continue;
+			}
+
 			if (configMatch) {
 				programSource = programSource.substring(programSource.indexOf("</compile>") + "</compile>".length);
 			}
