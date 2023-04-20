@@ -139,6 +139,7 @@ export default class CodeRunnerPlugin extends Plugin {
 }
 
 function codeBlockProcessor(element: HTMLElement,
+<<<<<<< HEAD
                             context: MarkdownPostProcessorContext,
                             app: App,
                             plugin: CodeRunnerPlugin) {
@@ -164,6 +165,33 @@ function codeBlockProcessor(element: HTMLElement,
             let programSource = codeBlock.innerText;
 
             const configMatch = programSource
+=======
+							context: MarkdownPostProcessorContext,
+							app: App,
+							plugin: CodeRunnerPlugin) {
+	const codeBlocks = element.querySelectorAll("code");
+
+	for (let i = 0; i < codeBlocks.length; i++) {
+		// Try catch is not ideal, but it both reduces errors and simplifies the code
+		try {
+			const codeBlock = codeBlocks[i];
+			if (codeBlock.classList.contains("has-codeblock-runner-button")) {
+				return;
+			} else {
+				codeBlock.classList.add("has-codeblock-runner-button");
+			}
+
+			let language = "NONE";
+			codeBlock.classList.forEach(property => {
+				if (property.startsWith("language-")) {
+					language = property.substring("language-".length);
+				}
+			});
+
+			let programSource = codeBlock.innerText;
+
+			const configMatch = programSource
+>>>>>>> master
 				.match(/<compile>([\s\S]*?)<\/compile>/);
 
             if (configMatch) {
