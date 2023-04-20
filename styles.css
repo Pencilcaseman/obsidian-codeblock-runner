@@ -123,3 +123,9 @@ img {
 	margin: 0px;
 	color: #4ba1e7;
 }
+
+@media print {
+	.codeblock-runner-button {
+		display: none !important;
+	}
+}
