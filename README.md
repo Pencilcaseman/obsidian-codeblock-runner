@@ -21,10 +21,11 @@ and [git](https://git-scm.com/) installed.
 	- Enable community plugins and then click "open plugins folder"
 2. Open a terminal window in this folder
 3. Run: `git clone https://github.com/Pencilcaseman/codeblock-runner.git`
-4. Run: `npm i`
-5. Run: `npm run build`
-6. Enable the plugin from the "Community Plugins" settings page
-7. Enjoy!
+4. `cd` into the cloned directory
+5. Run: `npm i`
+6. Run: `npm run build`
+7. Enable the plugin from the "Community Plugins" settings page
+8. Enjoy!
 
 This will produce a `main.js` file inside the repository folder, which Obsidian can open and make use of directly.
 There's nothing else you need to do.
